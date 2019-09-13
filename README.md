@@ -1,6 +1,7 @@
-# todo-list
+# sudoku-solver
 
-First webapp following from: https://practicalli.github.io/clojure-webapps/
+First time making a webapp in clojure.
+Practice for upcoming projects
 
 ## Usage
 

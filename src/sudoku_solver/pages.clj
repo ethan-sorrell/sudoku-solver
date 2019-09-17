@@ -42,3 +42,13 @@
         param-name (get params "firstparam")]
     (markup/html
      [:h1 "Received " (str param-name) "."])))
+
+(defn display-table
+  [request]
+  (let [{:keys [params uri]} request]
+    (markup/html
+     [:style
+      "table, th, td {border-collapse: collapse;}"
+      "th, td {padding: 3px;}"
+      "td {text-align:center; width:48px; height:48px;}"]
+     (backend/display-matrix (backend/solver params)))))

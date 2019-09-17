@@ -7,19 +7,25 @@
 
 (defn make-table []
   "make hiccup markup for sudoku input table"
-  (into [:table]
-        (for [y (range 0 (inc size))]
-          (cond
-            (= y 0)
-            (into [:tr [:th]]
-                  (for [x (range 1 (inc size))]
-                    [:th (str x)]))
-            :else
+  (into [:table {:border "2px solid;"}]
+        (for [y (range 1 (inc size))]
+          (if (= (rem y 3) 0)
             (into [:tr]
-                  (for [x (range 0 (inc size))]
-                    (if (= x 0)
-                      [:td (str y)]
-                      [:td (form/text-field {:size 4} (get-coord y x))])))))))
+                  (for [x (range 1 (inc size))]
+                    (if (= (rem x 3) 0)
+                      [:td
+                       {:style "border-right:2px solid; border-bottom:2px solid"}
+                       (form/text-field {:size 1} (get-coord y x))]
+                      [:td
+                       {:style "border-bottom:2px solid"}
+                       (form/text-field {:size 1} (get-coord y x))])))
+            (into [:tr]
+                  (for [x (range 1 (inc size))]
+                    (if (= (rem x 3) 0)
+                      [:td
+                       {:style "border-right:2px solid"}
+                       (form/text-field {:size 1} (get-coord y x))]
+                      [:td (form/text-field {:size 1} (get-coord y x))])))))))
 
 (defn display-matrix [matrix]
   "make hiccup markup for sudoku solution"

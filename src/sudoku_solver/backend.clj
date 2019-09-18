@@ -52,16 +52,27 @@
                       x (range 1 10)]
                   [(get matrix (get-coord y x)) (get-coord y x)])))))
 
-(defn valid-matrix-change?
+(defn valid-sudoku-cell?
   [matrix coord]
   (every? identity
           (map #(check-valid (% matrix coord))
                [get-row get-col get-vicinity])))
 
+(defn valid-sudoku
+  [matrix]
+  (every?
+   identity
+   (for [y (range 1 10)
+         x (range 1 10)
+         :let [coord (get-coord y x)
+               cell (matrix coord)]
+         :when (seq cell)]
+     (valid-sudoku-cell? matrix coord))))
+
 (defn sudoku-try-val
   [matrix coord val]
   (let [new-matrix (assoc matrix coord val)]
-    (valid-matrix-change? new-matrix coord)))
+    (valid-sudoku-cell? new-matrix coord)))
 
 (defn get-candidates [matrix coord]
   (let [used-vals (set (concat (get-row matrix coord)

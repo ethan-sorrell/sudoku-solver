@@ -17,13 +17,21 @@
     (backend/make-table)
     (form/submit-button "Solve!"))))
 
+(def invalid-puzzle-page
+  (markup/html
+   [:h1 "Sorry, the puzzle you entered was invalid."]
+   [:a {:href "/"} "Return to home page"]))
+
 (defn display-table
   [request]
   (let [{:keys [params uri]} request]
-    (markup/html
-     [:style
-      "table, th, td {border-collapse: collapse;}"
-      "th, td {padding: 3px;}"
-      "td {text-align:center; width:48px; height:48px;}"]
-     [:h1 "Solution:"]
-     (backend/display-matrix (backend/solver params)))))
+    (if (backend/valid-sudoku params)
+      (markup/html
+       [:style
+        "table, th, td {border-collapse: collapse;}"
+        "th, td {padding: 3px;}"
+        "td {text-align:center; width:48px; height:48px;}"]
+       [:h1 "Solution:"]
+       (backend/display-matrix (backend/solver params)))
+      ;; else
+      invalid-puzzle-page)))

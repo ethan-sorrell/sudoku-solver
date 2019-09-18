@@ -10,7 +10,7 @@
     "table, th, td {border-collapse: collapse;}"
     "th, td {padding: 3px;}"
     "td {text-align:center; width:48px; height:48px;}"]
-   [:h1 "Input your Sudoku Problem."]
+   [:h1 "Input Your Sudoku Problem:"]
    ;; Second form: Table
    (form/form-to
     [:post "post-result"]

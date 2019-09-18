@@ -5,13 +5,15 @@ Practice for upcoming projects
 
 ## Usage
 
-'''
+```
 lein run [port-number]
-'''
-
+```
+You will see the input page:
 ![Input page](./img/input_demo.jpg)
+Clicking solve will bring you to:
 ![Output page](./img/output_demo.jpg)
 
+Currently the solver uses brute-force. A more sophisticated implementation may come in the future.
 ## License
 
 Copyright © 2019 FIXME

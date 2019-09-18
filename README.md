@@ -5,7 +5,12 @@ Practice for upcoming projects
 
 ## Usage
 
-FIXME
+'''
+lein run [port-number]
+'''
+
+![Input page](./img/input_demo.jpg)
+![Output page](./img/output_demo.jpg)
 
 ## License
 

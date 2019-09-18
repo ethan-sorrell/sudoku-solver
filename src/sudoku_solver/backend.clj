@@ -5,47 +5,6 @@
 
 ;; Backend Functions
 
-(defn make-table []
-  "make hiccup markup for sudoku input table"
-  (into [:table {:border "2px solid;"}]
-        (for [y (range 1 (inc size))]
-          (if (= (rem y 3) 0)
-            (into [:tr]
-                  (for [x (range 1 (inc size))]
-                    (if (= (rem x 3) 0)
-                      [:td
-                       {:style "border-right:2px solid; border-bottom:2px solid"}
-                       (form/text-field {:size 1} (get-coord y x))]
-                      [:td
-                       {:style "border-bottom:2px solid"}
-                       (form/text-field {:size 1} (get-coord y x))])))
-            (into [:tr]
-                  (for [x (range 1 (inc size))]
-                    (if (= (rem x 3) 0)
-                      [:td
-                       {:style "border-right:2px solid"}
-                       (form/text-field {:size 1} (get-coord y x))]
-                      [:td (form/text-field {:size 1} (get-coord y x))])))))))
-
-(defn display-matrix [matrix]
-  "make hiccup markup for sudoku solution"
-  (into [:table {:border "2px solid;"}]
-        (for [y (range 1 (inc size))]
-          (if (= 0 (rem y 3))
-            (into [:tr]
-                  (for [x (range 1 (inc size))]
-                    (if (= 0 (rem x 3))
-                      [:td
-                       {:style "border-right:2px solid; border-bottom:2px solid"}
-                       (matrix (get-coord y x))]
-                      [:td {:style "border-bottom:2px solid"} (matrix (get-coord y x))])))
-            (into [:tr]
-                  (for [x (range 1 (inc size))]
-                    (if (= 0 (rem x 3))
-                      [:td {:style "border-right:2px solid;"}
-                       (matrix (get-coord y x))]
-                      [:td (matrix (get-coord y x))])))))))
-
 (def size 9)
 
 (defn get-coord [row col]
@@ -149,6 +108,47 @@
                    )))
         (print "\n")
         (when (= (rem y 3) 0) (print "\n")))))
+
+(defn make-table []
+  "make hiccup markup for sudoku input table"
+  (into [:table {:border "2px solid;"}]
+        (for [y (range 1 (inc size))]
+          (if (= (rem y 3) 0)
+            (into [:tr]
+                  (for [x (range 1 (inc size))]
+                    (if (= (rem x 3) 0)
+                      [:td
+                       {:style "border-right:2px solid; border-bottom:2px solid"}
+                       (form/text-field {:size 1} (get-coord y x))]
+                      [:td
+                       {:style "border-bottom:2px solid"}
+                       (form/text-field {:size 1} (get-coord y x))])))
+            (into [:tr]
+                  (for [x (range 1 (inc size))]
+                    (if (= (rem x 3) 0)
+                      [:td
+                       {:style "border-right:2px solid"}
+                       (form/text-field {:size 1} (get-coord y x))]
+                      [:td (form/text-field {:size 1} (get-coord y x))])))))))
+
+(defn display-matrix [matrix]
+  "make hiccup markup for sudoku solution"
+  (into [:table {:border "2px solid;"}]
+        (for [y (range 1 (inc size))]
+          (if (= 0 (rem y 3))
+            (into [:tr]
+                  (for [x (range 1 (inc size))]
+                    (if (= 0 (rem x 3))
+                      [:td
+                       {:style "border-right:2px solid; border-bottom:2px solid"}
+                       (matrix (get-coord y x))]
+                      [:td {:style "border-bottom:2px solid"} (matrix (get-coord y x))])))
+            (into [:tr]
+                  (for [x (range 1 (inc size))]
+                    (if (= 0 (rem x 3))
+                      [:td {:style "border-right:2px solid;"}
+                       (matrix (get-coord y x))]
+                      [:td (matrix (get-coord y x))])))))))
 
 (def empty-matrix
   {"c9" "", "e6" "", "b3" "", "d4" "", "a3" "", "c8" "", "f2" "", "h3" "", "i9" "", "f7" "", "b4" "", "e9" "", "a9" "", "e2" "", "f6" "", "g3" "", "f3" "", "d6" "", "b7" "", "d9" "", "h8" "", "d5" "", "f4" "", "d1" "", "i3" "", "g2" "", "h2" "", "e4" "", "a7" "", "d3" "", "g4" "", "e1" "", "i5" "", "i6" "", "a6" "", "b5" "", "d7" "", "a8" "", "d2" "", "b9" "", "h4" "", "g7" "", "e3" "", "f8" "", "i1" "", "i7" "", "g8" "", "c2" "", "d8" "", "b6" "", "g5" "", "f9" "", "a4" "", "f1" "", "e7" "", "h5" "", "g6" "", "i4" "", "c3" "", "a1" "", "b2" "", "g9" "", "e5" "", "a5" "", "e8" "", "i8" "", "c4" "", "h9" "", "h1" "", "i2" "", "g1" "", "h7" "", "c5" "", "f5" "", "c6" "", "a2" "", "c7" "", "c1" "", "b1" "", "h6" "", "b8" ""})

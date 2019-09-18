@@ -3,12 +3,6 @@
             [hiccup.form :as form]
             [sudoku-solver.backend :as backend]))
 
-(defn welcome
-  [request]
-  {:status 200
-   :body (markup/html [:h1 "Homepage"] [:p "This is a homepage"])
-   :headers {}})
-
 (defn form-test
   [request]
   (markup/html
@@ -31,4 +25,5 @@
       "table, th, td {border-collapse: collapse;}"
       "th, td {padding: 3px;}"
       "td {text-align:center; width:48px; height:48px;}"]
+     [:h1 "Solution:"]
      (backend/display-matrix (backend/solver params)))))

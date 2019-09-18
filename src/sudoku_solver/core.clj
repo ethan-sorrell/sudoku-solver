@@ -12,8 +12,7 @@
 
 ;; Routing
 (defroutes routes
-  (GET "/" [] pages/welcome)
-  (GET "/form-test" req (pages/form-test req))
+  (GET "/" req (pages/form-test req))
   (POST "/post-result" req (pages/display-table req))
   (not-found "<h1>Error</h1>
 <p>Page not found</p>"))

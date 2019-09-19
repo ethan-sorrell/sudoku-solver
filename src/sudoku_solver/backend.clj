@@ -2,7 +2,6 @@
   (:require [hiccup.core :as markup]
             [hiccup.form :as form]))
 
-
 ;; Backend Functions
 
 (def size 9)
@@ -83,7 +82,6 @@
       :when (not (contains? used-vals str-x))]
       str-x)))
 
-
 (defn solver [matrix]
   ;; search first empty cell
   ;; return matrix if none empty
@@ -105,20 +103,7 @@
             (recur matrix (drop 1 candidates) (first candidates)))))
     matrix))
 
-(defn print-matrix [matrix]
-  (print "\n")
-  (for [y (range 1 10)]
-    (do (print "|")
-        (apply print
-               (for [x (range 1 10)]
-                 (let [num (matrix (get-coord y x))
-                       repr (if (= num "") "_" num)]
-                   (cond
-                     (= (rem x 3) 0) (str repr \|)
-                     :else repr)
-                   )))
-        (print "\n")
-        (when (= (rem y 3) 0) (print "\n")))))
+;; HTML generation function
 
 (defn make-table []
   "make hiccup markup for sudoku input table"
@@ -160,6 +145,24 @@
                       [:td {:style "border-right:2px solid;"}
                        (matrix (get-coord y x))]
                       [:td (matrix (get-coord y x))])))))))
+
+;; Debug function
+
+(defn print-matrix [matrix]
+  (print "\n")
+  (for [y (range 1 10)]
+    (do (print "|")
+        (apply print
+               (for [x (range 1 10)]
+                 (let [num (matrix (get-coord y x))
+                       repr (if (= num "") "_" num)]
+                   (cond
+                     (= (rem x 3) 0) (str repr \|)
+                     :else repr)
+                   )))
+        (print "\n")
+        (when (= (rem y 3) 0) (print "\n")))))
+
 
 (def empty-matrix
   {"c9" "", "e6" "", "b3" "", "d4" "", "a3" "", "c8" "", "f2" "", "h3" "", "i9" "", "f7" "", "b4" "", "e9" "", "a9" "", "e2" "", "f6" "", "g3" "", "f3" "", "d6" "", "b7" "", "d9" "", "h8" "", "d5" "", "f4" "", "d1" "", "i3" "", "g2" "", "h2" "", "e4" "", "a7" "", "d3" "", "g4" "", "e1" "", "i5" "", "i6" "", "a6" "", "b5" "", "d7" "", "a8" "", "d2" "", "b9" "", "h4" "", "g7" "", "e3" "", "f8" "", "i1" "", "i7" "", "g8" "", "c2" "", "d8" "", "b6" "", "g5" "", "f9" "", "a4" "", "f1" "", "e7" "", "h5" "", "g6" "", "i4" "", "c3" "", "a1" "", "b2" "", "g9" "", "e5" "", "a5" "", "e8" "", "i8" "", "c4" "", "h9" "", "h1" "", "i2" "", "g1" "", "h7" "", "c5" "", "f5" "", "c6" "", "a2" "", "c7" "", "c1" "", "b1" "", "h6" "", "b8" ""})

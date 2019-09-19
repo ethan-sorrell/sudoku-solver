@@ -3,7 +3,7 @@
             [hiccup.form :as form]
             [sudoku-solver.backend :as backend]))
 
-(defn form-test
+(defn form-page
   [request]
   (markup/html
    [:style
@@ -11,7 +11,7 @@
     "th, td {padding: 3px;}"
     "td {text-align:center; width:48px; height:48px;}"]
    [:h1 "Input Your Sudoku Problem:"]
-   ;; Second form: Table
+   ;; Input Table
    (form/form-to
     [:post "post-result"]
     (backend/make-table)
@@ -22,7 +22,7 @@
    [:h1 "Sorry, the puzzle you entered was invalid."]
    [:a {:href "/"} "Return to home page"]))
 
-(defn display-table
+(defn result-page
   [request]
   (let [{:keys [params uri]} request]
     (if (backend/valid-sudoku params)

@@ -1,5 +1,6 @@
 (ns sudoku-solver.backend
-  (:require [hiccup.core :as markup]
+  (:require [clojure.string :as string]
+            [hiccup.core :as markup]
             [hiccup.form :as form]))
 
 ;; Backend Functions
@@ -23,12 +24,12 @@
   (let [elts (filter seq coll)]
     (= elts (distinct elts))))
 
-(defn get-row [matrix coord]
+(defn row-peers [coord]
   (let [[row-n col-n] (get-xy coord)]
     (for [col (range 1 10)]
-      (get matrix (get-coord row-n col)))))
+      (get-coord row-n col))))
 
-(defn get-vicinity [matrix coord]
+(defn vicinity-peers [coord]
   (let [[row-n col-n] (get-xy coord)
         col-3 (quot (dec col-n) 3)
         row-3 (quot (dec row-n) 3)
@@ -36,12 +37,21 @@
         start-row (inc (* 3 row-3))]
     (for [row (range start-row (+ start-row 3))
           col (range start-col (+ start-col 3))]
-      (get matrix (get-coord row col)))))
+      (get-coord row col))))
 
-(defn get-col [matrix coord]
+(defn col-peers [coord]
   (let [[row-n col-n] (get-xy coord)]
     (for [row (range 1 10)]
-      (get matrix (get-coord row col-n)))))
+      (get-coord row col-n))))
+
+(defn get-row [matrix coord] 
+  (map #(get matrix %) (row-peers coord)))
+
+(defn get-vicinity [matrix coord]
+  (map #(get matrix %) (vicinity-peers coord)))
+
+(defn get-col [matrix coord]
+  (map #(get matrix %) (col-peers coord)))
 
 (defn get-empty [matrix]
   (second
@@ -81,6 +91,73 @@
       :let [str-x (str x)]
       :when (not (contains? used-vals str-x))]
       str-x)))
+
+(declare assign elim eliminate)
+
+(defn peers [pos]
+  (concat (vicinity-peers pos) (col-peers pos) (row-peers pos)))
+
+(defn elim [matrix from value]
+  "Remove value from association with from in matrix"
+  (if-not (string/includes? (get matrix from) value)
+    matrix
+    (assoc matrix from (string/replace (get matrix from) (re-pattern value) ""))))
+
+
+(defn propagate-in [matrix pos]
+  "Check if any unit containing pos is reduces to one possible location for a value"
+  (let [val (get matrix pos)
+        units (conj []
+                    (get-row matrix pos)
+                    (get-col matrix pos)
+                    (get-vicinity matrix pos))
+        cand-units (map (fn [unit] (filter #(string/includes? % val) unit))
+                        units)]
+    (loop [result matrix
+           rem-units cand-units]
+      (if-not (seq rem-units)
+        result
+        (let [candidates (first rem-units)]
+          (if (< 1 (count candidates))
+            (recur result (rest rem-units))
+            (if (= 0 (count candidates))
+              false
+              (if-let [new-matrix (assign result (first candidates) val)]
+                (recur new-matrix (rest rem-units))
+                false))))))))
+
+(defn propagate-out [matrix pos]
+  "Propagate a new constraint out from pos to its units"
+  (let [val (get matrix pos)]
+    (loop [result matrix
+           rem-peers (peers pos)]
+      (if-let [peer (first rem-peers)]
+        (if-let [new-matrix (eliminate result peer val)]
+          (recur new-matrix (rest rem-peers))
+          false)
+        false))))
+
+(defn eliminate [matrix from value]
+  "Elim and propagate"
+  (let [new-matrix (elim matrix from value)
+        remaining-count (count (get new-matrix from))]
+    (cond
+      (= 0 remaining-count) false ;; no remaining possible values
+      ;; we have our value and need to propagate constraint
+      (= 1 remaining-count) (propagate-in (propagate-out new-matrix from) from)
+      :else new-matrix)))
+
+(defn assign [matrix pos value]
+  "Eliminate all other values associated with pos then propagate"
+  (let [current_val (get matrix pos)
+        other_vals (string/replace current_val (re-pattern value) "")]
+    (loop [result matrix
+            rem other_vals]
+      (if-not result
+        false
+        (if (= 0 (count rem)) result
+            (recur (eliminate result pos (first rem)) (rest rem)))))))
+
 
 (defn solver [matrix]
   ;; search first empty cell

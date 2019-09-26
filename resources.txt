@@ -1,3 +1,0 @@
-https://norvig.com/sudoku.html
-https://norvig.com/sudopy.shtml
-https://jkkramer.com/sudoku.html

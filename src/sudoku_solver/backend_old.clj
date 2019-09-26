@@ -3,7 +3,7 @@
             [hiccup.core :as markup]
             [hiccup.form :as form]))
 
-;;;;;;;;; Backend Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Backend Functions
 
 (def size 9)
 
@@ -18,6 +18,11 @@
         row (- (int row-char) 96)
         col (Character/digit col-char 10)]
     [row col]))
+
+(defn check-valid [coll]
+  "Take a collection of strings representing a row/col/vicinity"
+  (let [elts (filter seq coll)]
+    (= elts (distinct elts))))
 
 (defn row-peers [coord]
   (let [[row-n col-n] (get-xy coord)]
@@ -39,7 +44,7 @@
     (for [row (range 1 10)]
       (get-coord row col-n))))
 
-(defn get-row [matrix coord]
+(defn get-row [matrix coord] 
   (map #(get matrix %) (row-peers coord)))
 
 (defn get-vicinity [matrix coord]
@@ -49,7 +54,6 @@
   (map #(get matrix %) (col-peers coord)))
 
 (defn get-empty [matrix]
-  ;; TODO: fixme
   (second
    (first
     (drop-while #(not (nil? (seq (first %))))
@@ -57,142 +61,13 @@
                       x (range 1 10)]
                   [(get matrix (get-coord y x)) (get-coord y x)])))))
 
-
-;;;;;;;;;;;;; constraint propagation functions ;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare assign elim eliminate)
-
-(defn peers [pos]
-  (remove #(= % pos)
-          (concat (vicinity-peers pos)
-                  (col-peers pos)
-                  (row-peers pos))))
-
-(defn uninitialized-matrix []
-  (into
-   {}
-   (for [y (range 1 10)
-         x (range 1 10)
-         :let [coord (get-coord y x)]]
-     [coord "123456789"])))
-
-(defn parse-grid [matrix]
-  "parse from partially-filled in solution to description of constraints"
-  (loop [result (uninitialized-matrix)
-         rem matrix]
-    (if-not result
-      false
-      (if-not (seq rem)
-        result
-        (let [pair (first rem)
-              coord (first pair)
-              vals (second pair)]
-          (if-not (seq vals)
-            (recur result (rest rem))
-            (recur (assign result coord vals) (rest rem))))))))
-
-(defn elim [matrix from value]
-  "Remove value from association with from in matrix"
-  (assoc matrix from (string/replace (get matrix from) (re-pattern value) "")))
-
-(defn candidate-locations [matrix pos value]
-  "takes value and returns list of list of coords in unit which could contains value"
-  (for [unit (conj []
-                   (vicinity-peers pos)
-                   (row-peers pos)
-                   (col-peers pos))]
-    (for [loc unit
-          :when (and
-                 (not (= loc pos))
-                 (string/includes? (get matrix loc) value))]
-      loc)))
-
-(defn propagate-in [matrix pos value]
-  "Check if any unit containing pos is reduces to one possible location for a value"
-  (if-not matrix
-    false
-    (loop [result matrix
-           rem-units (candidate-locations matrix pos value)]
-      (if-not (seq rem-units)
-        result
-        (if (= 0 (count (first rem-units)))
-          false
-          (if (= 1 (count (first rem-units)))
-            (if-let [new-matrix
-                     (assign result (first (first rem-units)) value)]
-              (recur new-matrix (rest rem-units))
-              false)
-            (recur result (rest rem-units))))))))
-
-(defn propagate-out [matrix pos]
-  "Propagate a new constraint out from pos to its units"
-  (let [value (get matrix pos)]
-    (loop [result matrix
-           rem-peers (peers pos)]
-      (if-let [peer (first rem-peers)]
-        (if (= peer pos)
-          (recur result (rest rem-peers))
-          (if-let [new-matrix (eliminate result peer value)]
-            (recur new-matrix (rest rem-peers))
-            false))
-        result))))
-
-(defn eliminate [matrix from value]
-  "Elim and propagate"
-  (if-not (string/includes? (get matrix from) value)
-    matrix
-    (let [new-matrix (elim matrix from value)
-          remaining-count (count (get new-matrix from))]
-      (cond
-        (= 0 remaining-count) false ;; no remaining possible values
-        ;; we have our value and need to propagate constraint
-        (= 1 remaining-count) (propagate-in (propagate-out new-matrix from) from value)
-        :else new-matrix))))
-
-(defn assign [matrix pos value]
-  "Eliminate all other values associated with pos then propagate"
-  (if-not matrix
-    false
-    (let [current_val (get matrix pos)
-          other_vals (string/replace current_val (re-pattern value) "")]
-      (loop [result matrix
-             rem other_vals]
-        (if-not result
-          false
-          (if (= 0 (count rem))
-            result
-            (recur (eliminate result pos (str (first rem))) (rest rem))))))))
-
-(defn search [matrix]
-  "Returns solution or nil if none found"
-  (when matrix
-    (if-let [unsolved (seq (filter #(not (= 1 (count (second %)))) matrix))]
-      (let [max-constr (apply min-key #(count (get matrix %))
-                              (keys unsolved))]
-        (some identity
-              (for [candidate (get matrix max-constr)]
-                (search (assign matrix max-constr (str candidate))))))
-      matrix)))
-
-(defn solve [matrix]
-  "Returns solution or nil if contradiction found"
-  (search (parse-grid matrix)))
-
-;;;;;;;;;;;;; search functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn check-valid [coll]
-  ;; TODO: fixme
-  "Take a collection of strings representing a row/col/vicinity"
-  (let [elts (filter seq coll)]
-    (= elts (distinct elts))))
-
 (defn valid-sudoku-cell?
-  ;; TODO: fixme
   [matrix coord]
   (every? identity
           (map #(check-valid (% matrix coord))
                [get-row get-col get-vicinity])))
 
 (defn valid-sudoku
-  ;; TODO: fixme
   [matrix]
   (every?
    identity
@@ -217,7 +92,6 @@
       :when (not (contains? used-vals str-x))]
       str-x)))
 
-
 (defn solver [matrix]
   ;; search first empty cell
   ;; return matrix if none empty
@@ -239,7 +113,7 @@
             (recur matrix (drop 1 candidates) (first candidates)))))
     matrix))
 
-;;;;;;;;;;;;;;;;;;; HTML generation function ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; HTML generation function
 
 (defn make-table []
   "make hiccup markup for sudoku input table"
@@ -282,7 +156,7 @@
                        (matrix (get-coord y x))]
                       [:td (matrix (get-coord y x))])))))))
 
-;;;;;;;;;;;;;; Debug function ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Debug function
 
 (defn print-matrix [matrix]
   (print "\n")
@@ -314,90 +188,6 @@
 
 (def test-matrix-3
   {"c9" "", "e6" "", "b3" "", "d4" "", "a3" "5", "c8" "", "f2" "", "h3" "4", "i9" "", "f7" "", "b4" "", "e9" "6", "a9" "", "e2" "1", "f6" "", "g3" "", "f3" "3", "d6" "5", "b7" "", "d9" "", "h8" "3", "d5" "", "f4" "2", "d1" "4", "i3" "", "g2" "6", "h2" "", "e4" "", "a7" "", "d3" "", "g4" "5", "e1" "", "i5" "", "i6" "9", "a6" "", "b5" "", "d7" "3", "a8" "", "d2" "", "b9" "", "h4" "", "g7" "", "e3" "", "f8" "8", "i1" "", "i7" "7", "g8" "", "c2" "7", "d8" "", "b6" "", "g5" "", "f9" "", "a4" "3", "f1" "", "e7" "", "h5" "", "g6" "", "i4" "", "c3" "", "a1" "", "b2" "", "g9" "9", "e5" "7", "a5" "", "e8" "", "i8" "", "c4" "", "h9" "", "h1" "", "i2" "", "g1" "", "h7" "", "c5" "1", "f5" "", "c6" "", "a2" "", "c7" "5", "c1" "", "b1" "8", "h6" "", "b8" "2"})
-
-
-(def parsed-test-matrix-1
-  {"c9" "123456789",
-   "e6" "123456789",
-   "b3" "123456789",
-   "d4" "123456789",
-   "a3" "3",
-   "c8" "123456789",
-   "f2" "123456789",
-   "h3" "123456789",
-   "i9" "123456789",
-   "f7" "123456789",
-   "b4" "123456789",
-   "e9" "123456789",
-   "a9" "9",
-   "e2" "123456789",
-   "f6" "123456789",
-   "g3" "123456789",
-   "f3" "123456789",
-   "d6" "123456789",
-   "b7" "123456789",
-   "d9" "123456789",
-   "h8" "123456789",
-   "d5" "123456789",
-   "f4" "123456789",
-   "d1" "123456789",
-   "i3" "123456789",
-   "g2" "123456789",
-   "h2" "123456789",
-   "e4" "123456789",
-   "a7" "7",
-   "d3" "123456789",
-   "g4" "123456789",
-   "e1" "123456789",
-   "i5" "123456789",
-   "i6" "123456789",
-   "a6" "6",
-   "b5" "123456789",
-   "d7" "123456789",
-   "a8" "8",
-   "d2" "123456789",
-   "b9" "123456789",
-   "h4" "123456789",
-   "g7" "123456789",
-   "e3" "123456789",
-   "f8" "123456789",
-   "i1" "123456789",
-   "i7" "123456789",
-   "g8" "123456789",
-   "c2" "123456789",
-   "d8" "123456789",
-   "b6" "123456789",
-   "g5" "123456789",
-   "f9" "123456789",
-   "a4" "4",
-   "f1" "123456789",
-   "e7" "123456789",
-   "h5" "123456789",
-   "g6" "123456789",
-   "i4" "123456789",
-   "c3" "123456789",
-   "a1" "1",
-   "b2" "123456789",
-   "g9" "123456789",
-   "e5" "123456789",
-   "a5" "5",
-   "e8" "123456789",
-   "i8" "123456789",
-   "c4" "123456789",
-   "h9" "123456789",
-   "h1" "123456789",
-   "i2" "123456789",
-   "g1" "123456789",
-   "h7" "123456789",
-   "c5" "123456789",
-   "f5" "123456789",
-   "c6" "123456789",
-   "a2" "123456789",
-   "c7" "123456789",
-   "c1" "123456789",
-   "b1" "123456789",
-   "h6" "123456789",
-   "b8" "123456789"})
 
 ;; (defn solve-sudoku
 ;;   [matrix]

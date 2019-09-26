@@ -43,7 +43,10 @@
           "th, td {padding: 3px;}"
           "td {text-align:center; width:48px; height:48px;}"]
          [:h1 "Solution:"]
-         (backend/display-matrix soln)
+         (if soln
+           (backend/display-matrix soln)
+           [:p "No valid solution."]
+           )
          [:h1 (string/replace time-elapsed #"\"" "")]))
       ;; else
       invalid-puzzle-page)))

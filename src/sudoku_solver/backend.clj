@@ -75,12 +75,11 @@
          :let [coord (get-coord y x)]]
      [coord "123456789"])))
 
-(defn parse-grid [matrix]
+(defn parse-matrix [matrix]
   "parse from partially-filled in solution to description of constraints"
   (loop [result (uninitialized-matrix)
          rem matrix]
-    (if-not result
-      false
+    (when result
       (if-not (seq rem)
         result
         (let [pair (first rem)
@@ -108,14 +107,12 @@
 
 (defn propagate-in [matrix pos value]
   "Check if any unit containing pos is reduces to one possible location for a value"
-  (if-not matrix
-    false
+  (when matrix
     (loop [result matrix
            rem-units (candidate-locations matrix pos value)]
       (if-not (seq rem-units)
         result
-        (if (= 0 (count (first rem-units)))
-          false
+        (when-not (= 0 (count (first rem-units)))
           (if (= 1 (count (first rem-units)))
             (if-let [new-matrix
                      (assign result (first (first rem-units)) value)]
@@ -150,14 +147,12 @@
 
 (defn assign [matrix pos value]
   "Eliminate all other values associated with pos then propagate"
-  (if-not matrix
-    false
+  (when matrix
     (let [current_val (get matrix pos)
           other_vals (string/replace current_val (re-pattern value) "")]
       (loop [result matrix
              rem other_vals]
-        (if-not result
-          false
+        (when result
           (if (= 0 (count rem))
             result
             (recur (eliminate result pos (str (first rem))) (rest rem))))))))
@@ -166,33 +161,30 @@
   "Returns solution or nil if none found"
   (when matrix
     (if-let [unsolved (seq (filter #(not (= 1 (count (second %)))) matrix))]
-      (let [max-constr (apply min-key #(count (get matrix %))
-                              (keys unsolved))]
+      (let [max-constr (apply min-key #(count (second %)) unsolved)]
         (some identity
-              (for [candidate (get matrix max-constr)]
-                (search (assign matrix max-constr (str candidate))))))
+              (for [candidate (second max-constr)]
+                (search (assign matrix (first max-constr) (str candidate))))))
       matrix)))
 
 (defn solve [matrix]
   "Returns solution or nil if contradiction found"
-  (search (parse-grid matrix)))
+  (search (parse-matrix matrix)))
 
 ;;;;;;;;;;;;; search functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; NOTE: these functions take unparsed puzzles (i.e. not constraints)
 (defn check-valid [coll]
-  ;; TODO: fixme
   "Take a collection of strings representing a row/col/vicinity"
   (let [elts (filter seq coll)]
     (= elts (distinct elts))))
 
 (defn valid-sudoku-cell?
-  ;; TODO: fixme
   [matrix coord]
   (every? identity
           (map #(check-valid (% matrix coord))
                [get-row get-col get-vicinity])))
 
 (defn valid-sudoku
-  ;; TODO: fixme
   [matrix]
   (every?
    identity
@@ -398,6 +390,91 @@
    "b1" "123456789",
    "h6" "123456789",
    "b8" "123456789"})
+
+(def test-matrix-4
+  ;; No possible solution for a2
+  {"c9" "",
+   "e6" "",
+   "b3" "",
+   "d4" "",
+   "a3" "3",
+   "c8" "",
+   "f2" "",
+   "h3" "",
+   "i9" "",
+   "f7" "",
+   "b4" "",
+   "e9" "",
+   "a9" "9",
+   "e2" "",
+   "f6" "",
+   "g3" "",
+   "f3" "",
+   "d6" "",
+   "b7" "",
+   "d9" "",
+   "h8" "",
+   "d5" "",
+   "f4" "",
+   "d1" "",
+   "i3" "",
+   "g2" "",
+   "h2" "",
+   "e4" "",
+   "a7" "7",
+   "d3" "",
+   "g4" "",
+   "e1" "",
+   "i5" "",
+   "i6" "",
+   "a6" "6",
+   "b5" "",
+   "d7" "",
+   "a8" "8",
+   "d2" "",
+   "b9" "",
+   "h4" "",
+   "g7" "",
+   "e3" "",
+   "f8" "",
+   "i1" "",
+   "i7" "",
+   "g8" "",
+   "c2" "",
+   "d8" "",
+   "b6" "",
+   "g5" "",
+   "f9" "",
+   "a4" "4",
+   "f1" "",
+   "e7" "",
+   "h5" "",
+   "g6" "",
+   "i4" "",
+   "c3" "",
+   "a1" "1",
+   "b2" "2",
+   "g9" "",
+   "e5" "",
+   "a5" "5",
+   "e8" "",
+   "i8" "",
+   "c4" "",
+   "h9" "",
+   "h1" "",
+   "i2" "",
+   "g1" "",
+   "h7" "",
+   "c5" "",
+   "f5" "",
+   "c6" "",
+   "a2" "",
+   "c7" "",
+   "c1" "",
+   "b1" "",
+   "h6" "",
+   "b8" ""}
+  )
 
 ;; (defn solve-sudoku
 ;;   [matrix]

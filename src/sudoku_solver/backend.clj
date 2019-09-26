@@ -76,6 +76,7 @@
      [coord "123456789"])))
 
 (defn parse-grid [matrix]
+  "parse from partially-filled in solution to description of constraints"
   (loop [result (uninitialized-matrix)
          rem matrix]
     (if-not result
@@ -160,6 +161,21 @@
           (if (= 0 (count rem))
             result
             (recur (eliminate result pos (str (first rem))) (rest rem))))))))
+
+(defn search [matrix]
+  "Returns solution or nil if none found"
+  (when matrix
+    (if-let [unsolved (seq (filter #(not (= 1 (count (second %)))) matrix))]
+      (let [max-constr (apply min-key #(count (get matrix %))
+                              (keys unsolved))]
+        (some identity
+              (for [candidate (get matrix max-constr)]
+                (search (assign matrix max-constr (str candidate))))))
+      matrix)))
+
+(defn solve [matrix]
+  "Returns solution or nil if contradiction found"
+  (search (parse-grid matrix)))
 
 ;;;;;;;;;;;;; search functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn check-valid [coll]

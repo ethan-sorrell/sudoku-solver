@@ -32,6 +32,6 @@
         "th, td {padding: 3px;}"
         "td {text-align:center; width:48px; height:48px;}"]
        [:h1 "Solution:"]
-       (backend/display-matrix (backend/solver params)))
+       (backend/display-matrix (backend/solve params)))
       ;; else
       invalid-puzzle-page)))

@@ -1,5 +1,6 @@
 (ns sudoku-solver.pages
-  (:require [hiccup.core :as markup]
+  (:require [clojure.string :as string]
+            [hiccup.core :as markup]
             [hiccup.form :as form]
             [sudoku-solver.backend :as backend]))
 
@@ -22,16 +23,27 @@
    [:h1 "Sorry, the puzzle you entered was invalid."]
    [:a {:href "/"} "Return to home page"]))
 
+(defmacro stdout-and-output
+  [& body]
+  `(let [s# (new java.io.StringWriter)]
+     (binding [*out* s#]
+       (let [r# ~@body]
+         {:result r#
+          :str    (str s#)}))))
+
 (defn result-page
   [request]
   (let [{:keys [params uri]} request]
     (if (backend/valid-sudoku params)
-      (markup/html
-       [:style
-        "table, th, td {border-collapse: collapse;}"
-        "th, td {padding: 3px;}"
-        "td {text-align:center; width:48px; height:48px;}"]
-       [:h1 "Solution:"]
-       (backend/display-matrix (backend/solve params)))
+      (let [result-map (stdout-and-output (time (backend/solve params)))
+            {soln :result time-elapsed :str} result-map]
+        (markup/html
+         [:style
+          "table, th, td {border-collapse: collapse;}"
+          "th, td {padding: 3px;}"
+          "td {text-align:center; width:48px; height:48px;}"]
+         [:h1 "Solution:"]
+         (backend/display-matrix soln)
+         [:h1 (string/replace time-elapsed #"\"" "")]))
       ;; else
       invalid-puzzle-page)))

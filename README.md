@@ -13,7 +13,7 @@ You will see the input page:
 Clicking solve will bring you to:  
 ![Output page](./img/output_demo.jpg)  
 
-The solver uses an adaptation of norvig's solver described ![Here](https://norvig.com/sudoku.html)
+The solver uses an adaptation of norvig's solver described [Here](https://norvig.com/sudoku.html)
 ## License
 
 Copyright © 2019 FIXME

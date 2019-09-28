@@ -39,23 +39,14 @@
     (for [row (range 1 10)]
       (get-coord row col-n))))
 
-(defn get-row [matrix coord]
+(defn row-values [matrix coord]
   (map #(get matrix %) (row-peers coord)))
 
-(defn get-vicinity [matrix coord]
+(defn vicinity-values [matrix coord]
   (map #(get matrix %) (vicinity-peers coord)))
 
-(defn get-col [matrix coord]
+(defn col-values [matrix coord]
   (map #(get matrix %) (col-peers coord)))
-
-(defn get-empty [matrix]
-  ;; TODO: fixme
-  (second
-   (first
-    (drop-while #(not (nil? (seq (first %))))
-                (for [y (range 1 10)
-                      x (range 1 10)]
-                  [(get matrix (get-coord y x)) (get-coord y x)])))))
 
 
 ;;;;;;;;;;;;; constraint propagation functions ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -177,22 +168,20 @@
   "Returns solution or nil if contradiction found"
   (search (parse-grid matrix)))
 
-;;;;;;;;;;;;; search functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; validation functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn check-valid [coll]
-  ;; TODO: fixme
   "Take a collection of strings representing a row/col/vicinity"
   (let [elts (filter seq coll)]
     (= elts (distinct elts))))
 
 (defn valid-sudoku-cell?
-  ;; TODO: fixme
   [matrix coord]
   (every? identity
           (map #(check-valid (% matrix coord))
-               [get-row get-col get-vicinity])))
+               [row-values col-values vicinity-values])))
 
 (defn valid-sudoku
-  ;; TODO: fixme
   [matrix]
   (every?
    identity
@@ -202,42 +191,6 @@
                cell (matrix coord)]
          :when (seq cell)]
      (valid-sudoku-cell? matrix coord))))
-
-(defn sudoku-try-val
-  [matrix coord val]
-  (let [new-matrix (assoc matrix coord val)]
-    (valid-sudoku-cell? new-matrix coord)))
-
-(defn get-candidates [matrix coord]
-  (let [used-vals (set (concat (get-row matrix coord)
-                               (get-col matrix coord)
-                               (get-vicinity matrix coord)))]
-    (for [x (range 1 10)
-      :let [str-x (str x)]
-      :when (not (contains? used-vals str-x))]
-      str-x)))
-
-
-(defn solver [matrix]
-  ;; search first empty cell
-  ;; return matrix if none empty
-  ;;
-  ;; found first empty => try values until first valid
-  ;; If there's a valid value:
-  ;;   Recur with value filled in
-  ;; Else:
-  ;;   Return empty map
-  ;; (print (print-matrix matrix))
-  (if-let [empty-coord (get-empty matrix)]
-    (loop
-        [acc matrix
-         candidates (get-candidates matrix empty-coord)
-         candidate (first candidates)]
-      (if (nil? candidate) nil
-          (if-let [soln (solver (assoc matrix empty-coord candidate))]
-            soln
-            (recur matrix (drop 1 candidates) (first candidates)))))
-    matrix))
 
 ;;;;;;;;;;;;;;;;;;; HTML generation function ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -403,6 +356,6 @@
 ;;   [matrix]
 ;;   (loop [rem matrix
 ;;          check-coord (first-empty rem)
-;;          row (get-row check-coord)
-;;          col (get-col check-coord)
-;;          vicinity (get-vicinity check-coord rem)]))
+;;          row (row-values check-coord)
+;;          col (col-values check-coord)
+;;          vicinity (vicinity-values check-coord rem)]))

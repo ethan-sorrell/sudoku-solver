@@ -50,7 +50,7 @@
 
 
 ;;;;;;;;;;;;; constraint propagation functions ;;;;;;;;;;;;;;;;;;;;;;;;;;
-(declare assign elim eliminate)
+(declare assign eliminate)
 
 (defn peers [pos]
   (remove #(= % pos)
@@ -65,26 +65,6 @@
          x (range 1 10)
          :let [coord (get-coord y x)]]
      [coord "123456789"])))
-
-(defn parse-grid [matrix]
-  "parse from partially-filled in solution to description of constraints"
-  (loop [result (uninitialized-matrix)
-         rem matrix]
-    (if-not result
-      false
-      (if-not (seq rem)
-        result
-        (let [pair (first rem)
-              coord (first pair)
-              vals (second pair)]
-          (if-not (seq vals)
-            (recur result (rest rem))
-            (recur (assign result coord vals) (rest rem))))))))
-
-(defn elim [matrix from value]
-  "Remove value from association with from in matrix"
-  (assoc matrix from (string/replace (get matrix from) (re-pattern value) "")))
-
 (defn candidate-locations [matrix pos value]
   "takes value and returns list of list of coords in unit which could contains value"
   (for [unit (conj []
@@ -127,6 +107,11 @@
             false))
         result))))
 
+(defn elim [matrix from value]
+  "Remove value from association with from in matrix"
+  (assoc matrix from (string/replace (get matrix from) (re-pattern value) "")))
+
+
 (defn eliminate [matrix from value]
   "Elim and propagate"
   (if-not (string/includes? (get matrix from) value)
@@ -152,6 +137,21 @@
           (if (= 0 (count rem))
             result
             (recur (eliminate result pos (str (first rem))) (rest rem))))))))
+
+(defn parse-grid [matrix]
+  "parse from partially-filled in solution to description of constraints"
+  (loop [result (uninitialized-matrix)
+         rem matrix]
+    (if-not result
+      false
+      (if-not (seq rem)
+        result
+        (let [pair (first rem)
+              coord (first pair)
+              vals (second pair)]
+          (if-not (seq vals)
+            (recur result (rest rem))
+            (recur (assign result coord vals) (rest rem))))))))
 
 (defn search [matrix]
   "Returns solution or nil if none found"

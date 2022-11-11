@@ -22,7 +22,7 @@
 
 (def invalid-puzzle-page
   (markup/html
-    [:style "p, h1 {font-family: Corbel, \"Lucida Grande\", \"Lucida Sans Unicode\", \"Lucida Sans\", \"DejaVu Sans\", \"Bitstream Vera Sans\", \"Liberation Sans\", Verdana, \"Verdana Ref\", sans-serif}" ]
+   [:style "p, h1 {font-family: Corbel, \"Lucida Grande\", \"Lucida Sans Unicode\", \"Lucida Sans\", \"DejaVu Sans\", \"Bitstream Vera Sans\", \"Liberation Sans\", Verdana, \"Verdana Ref\", sans-serif}"]
    [:h1 "Sorry, the puzzle you entered was invalid."]
    [:a {:href "/"} "Return to home page"]))
 

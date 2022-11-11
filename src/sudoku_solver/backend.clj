@@ -57,7 +57,6 @@
                       x (range 1 10)]
                   [(get matrix (get-coord y x)) (get-coord y x)])))))
 
-
 ;;;;;;;;;;;;; constraint propagation functions ;;;;;;;;;;;;;;;;;;;;;;;;;;
 (declare assign elim eliminate)
 
@@ -205,10 +204,9 @@
                                (get-col matrix coord)
                                (get-vicinity matrix coord)))]
     (for [x (range 1 10)
-      :let [str-x (str x)]
-      :when (not (contains? used-vals str-x))]
+          :let [str-x (str x)]
+          :when (not (contains? used-vals str-x))]
       str-x)))
-
 
 (defn solver [matrix]
   ;; search first empty cell
@@ -222,9 +220,9 @@
   ;; (print (print-matrix matrix))
   (if-let [empty-coord (get-empty matrix)]
     (loop
-        [acc matrix
-         candidates (get-candidates matrix empty-coord)
-         candidate (first candidates)]
+     [acc matrix
+      candidates (get-candidates matrix empty-coord)
+      candidate (first candidates)]
       (if (nil? candidate) nil
           (if-let [soln (solver (assoc matrix empty-coord candidate))]
             soln
@@ -286,11 +284,9 @@
                        repr (if (= num "") "_" num)]
                    (cond
                      (= (rem x 3) 0) (str repr \|)
-                     :else repr)
-                   )))
+                     :else repr))))
         (print "\n")
         (when (= (rem y 3) 0) (print "\n")))))
-
 
 (def empty-matrix
   {"c9" "", "e6" "", "b3" "", "d4" "", "a3" "", "c8" "", "f2" "", "h3" "", "i9" "", "f7" "", "b4" "", "e9" "", "a9" "", "e2" "", "f6" "", "g3" "", "f3" "", "d6" "", "b7" "", "d9" "", "h8" "", "d5" "", "f4" "", "d1" "", "i3" "", "g2" "", "h2" "", "e4" "", "a7" "", "d3" "", "g4" "", "e1" "", "i5" "", "i6" "", "a6" "", "b5" "", "d7" "", "a8" "", "d2" "", "b9" "", "h4" "", "g7" "", "e3" "", "f8" "", "i1" "", "i7" "", "g8" "", "c2" "", "d8" "", "b6" "", "g5" "", "f9" "", "a4" "", "f1" "", "e7" "", "h5" "", "g6" "", "i4" "", "c3" "", "a1" "", "b2" "", "g9" "", "e5" "", "a5" "", "e8" "", "i8" "", "c4" "", "h9" "", "h1" "", "i2" "", "g1" "", "h7" "", "c5" "", "f5" "", "c6" "", "a2" "", "c7" "", "c1" "", "b1" "", "h6" "", "b8" ""})
@@ -306,7 +302,6 @@
 
 (def test-matrix-3
   {"c9" "", "e6" "", "b3" "", "d4" "", "a3" "5", "c8" "", "f2" "", "h3" "4", "i9" "", "f7" "", "b4" "", "e9" "6", "a9" "", "e2" "1", "f6" "", "g3" "", "f3" "3", "d6" "5", "b7" "", "d9" "", "h8" "3", "d5" "", "f4" "2", "d1" "4", "i3" "", "g2" "6", "h2" "", "e4" "", "a7" "", "d3" "", "g4" "5", "e1" "", "i5" "", "i6" "9", "a6" "", "b5" "", "d7" "3", "a8" "", "d2" "", "b9" "", "h4" "", "g7" "", "e3" "", "f8" "8", "i1" "", "i7" "7", "g8" "", "c2" "7", "d8" "", "b6" "", "g5" "", "f9" "", "a4" "3", "f1" "", "e7" "", "h5" "", "g6" "", "i4" "", "c3" "", "a1" "", "b2" "", "g9" "9", "e5" "7", "a5" "", "e8" "", "i8" "", "c4" "", "h9" "", "h1" "", "i2" "", "g1" "", "h7" "", "c5" "1", "f5" "", "c6" "", "a2" "", "c7" "5", "c1" "", "b1" "8", "h6" "", "b8" "2"})
-
 
 (def parsed-test-matrix-1
   {"c9" "123456789",
@@ -473,8 +468,7 @@
    "c1" "",
    "b1" "",
    "h6" "",
-   "b8" ""}
-  )
+   "b8" ""})
 
 ;; (defn solve-sudoku
 ;;   [matrix]

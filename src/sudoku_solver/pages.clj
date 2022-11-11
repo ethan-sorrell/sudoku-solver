@@ -16,7 +16,7 @@
    [:small "Put the numbers in the boxes already"]
    ;; Input Table
    (form/form-to
-    [:post "post-result"]
+    [:post "result"]
     (backend/make-table)
     (form/submit-button "Solve!"))))
 

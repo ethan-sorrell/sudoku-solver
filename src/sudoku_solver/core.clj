@@ -2,18 +2,14 @@
   (:require [ring.adapter.jetty :as jetty]
             [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.params :refer [wrap-params]]
-            [ring.handler.dump :refer [handle-dump]]
             [compojure.core :refer [defroutes GET POST]]
-            [hiccup.core :as markup]
-            [hiccup.form :as form]
             [compojure.route :refer [not-found]]
-            [sudoku-solver.backend :as backend]
             [sudoku-solver.pages :as pages]))
 
 ;; Routing
 (defroutes routes
   (GET "/" req (pages/form-page req))
-  (POST "/post-result" req (pages/result-page req))
+  (POST "/result" req (pages/result-page req))
   (not-found "<h1>Error</h1>
 <p>Page not found</p>"))
 

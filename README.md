@@ -1,7 +1,8 @@
 # sudoku-solver
 
-First time making a webapp in Clojure.
-Practice for upcoming projects.
+First time making a webapp in Clojure. 
+
+The source is a huge mess, but everytime I think about cleaning it up I realize I made so many wrong choices it'd be easier to just rewrite. The core algo is really just 3-4 nested reduces.
 
 ## Usage
 

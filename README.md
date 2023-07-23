@@ -2,8 +2,7 @@
 
 First time making a webapp in Clojure. 
 
-The source is a huge mess, but everytime I think about cleaning it up I realize I made so many wrong choices it'd be easier to just rewrite. The core algo is really just 3-4 nested reduces.
-
+The source is a huge mess, but everytime I think about cleaning it up I realize I made so many wrong choices it'd be easier to just rewrite. And now I did, but not in way that interfaces with the rest of this app. If you just want to run a server to solve your sudoku problems, this app still works. If you want to look at some pretty source code to accomplish that, look [here.](https://gist.github.com/kawpuh/b7a842af2ca24e8a0c382b88ed1bbb62)
 ## Usage
 
 ```
